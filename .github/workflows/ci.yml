@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build with warnings as errors
+        run: make CXXFLAGS='-O2 -std=c++17 -Wall -Wextra -Wpedantic -Werror'
+      - name: Test
+        run: make test CXXFLAGS='-O2 -std=c++17 -Wall -Wextra -Wpedantic -Werror'
+
+  sanitizers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build with AddressSanitizer and UndefinedBehaviorSanitizer
+        run: >-
+          make CXXFLAGS='-O1 -g -std=c++17 -Wall -Wextra -Wpedantic -Werror
+          -fsanitize=address,undefined -fno-omit-frame-pointer'
+      - name: Test with sanitizers
+        run: >-
+          make test CXXFLAGS='-O1 -g -std=c++17 -Wall -Wextra -Wpedantic -Werror
+          -fsanitize=address,undefined -fno-omit-frame-pointer'

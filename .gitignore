@@ -1,0 +1,6 @@
+/build/
+/ttfx
+.DS_Store
+*.swp
+*.swo
+compile_commands.json
